@@ -44,9 +44,9 @@ The original XDoom engine relied on raw X11/XShm and OSS/Linux sound drivers (`/
   - Player forward and backward movement accepts `W` and `S` in addition to Up and Down arrow keys.
   - Player strafing left and right accepts `A` and `D` in addition to `,` and `.` (or configured strafe keys).
   - Both key schemes work seamlessly in parallel without conflicting with weapon hotkeys or automap controls.
-- **Mouse Turning & Look**:
-  - In `i_video_sdl3.c`, relative mouse motion updates horizontal/vertical look deltas via `SDL_EVENT_MOUSE_MOTION`.
-  - In `g_game.c`, horizontal mouse motion turns the player angle (`cmd->angleturn -= mousex * 0x8`), allowing smooth mouse mouselook turning.
+- **Mouse Lookaround Only (No Forward/Backward/Strafe Movement from Mouse)**:
+  - In `i_video_sdl3.c`, relative mouse motion updates deltas via `SDL_EVENT_MOUSE_MOTION`.
+  - In `g_game.c`, horizontal mouse motion turns the player angle only (`cmd->angleturn -= mousex * 0x8`), allowing smooth mouse lookaround without any forward/backward movement (`forward += mousey` removed) or mouse strafing (`side += mousex` removed). All player movement is handled exclusively by keyboard (WASD and arrow keys).
   - Mouse buttons remain bindable for weapon fire, use, or strafe.
 
 ---

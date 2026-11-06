@@ -406,11 +406,8 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	}
     }
 
-    forward += mousey;
-    if (strafe)
-	side += mousex * 2;
-    else
-	cmd->angleturn -= mousex * 0x8;
+    // Mouse turns / looks around only; never moves forward/backward or strafes
+    cmd->angleturn -= mousex * 0x8;
 
     mousex = mousey = 0;
 
