@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Interactive launcher for psDooM
-# Lets the user choose which WAD / game configuration to run.
+# Pure Bash - zero external UI dependencies.
 #
 set -euo pipefail
 
@@ -19,60 +19,47 @@ if [[ ! -x "${BIN}" ]]; then
     cmake --build "${BUILD_DIR}"
 fi
 
-# Options:
-# 1) Freedoom: Phase 1 (Doom 1 / Ultimate Doom) + psdoom1.wad
-# 2) Freedoom: Phase 2 (Doom 2 / Hell on Earth) + psdoom2.wad
-# 3) Custom IWAD + PWAD selection
-OPTIONS=(
-    "1" "Freedoom Phase 1 (Ultimate Doom) + psDooM 1"
-    "2" "Freedoom Phase 2 (Doom 2) + psDooM 2"
-    "3" "Vanilla / Custom IWAD from system or path"
-)
+echo "=================================================="
+echo "                 psDooM Launcher                  "
+echo "=================================================="
+echo "Select a WAD configuration to play:"
+echo "  1) Freedoom Phase 1 (Ultimate Doom) + psDooM 1"
+echo "  2) Freedoom Phase 2 (Doom 2) + psDooM 2"
+echo "  3) Custom IWAD from path"
+echo "  q) Quit"
+echo "--------------------------------------------------"
 
 CHOICE=""
-if command -v whiptail >/dev/null 2>&1 && [ -t 0 ]; then
-    CHOICE=$(whiptail --title "psDooM Launcher" \
-                      --menu "Select a WAD configuration to play:" 15 65 3 \
-                      "${OPTIONS[@]}" \
-                      3>&1 1>&2 2>&3 || true)
-fi
-
-# Fallback to interactive CLI menu if whiptail is unavailable or cancelled
-if [[ -z "${CHOICE}" ]]; then
-    echo "========================================"
-    echo "            psDooM Launcher             "
-    echo "========================================"
-    echo "Select a WAD configuration to play:"
-    echo "  1) Freedoom Phase 1 (Ultimate Doom) + psDooM 1"
-    echo "  2) Freedoom Phase 2 (Doom 2) + psDooM 2"
-    echo "  3) Custom IWAD from path"
-    echo "  q) Quit"
-    echo "----------------------------------------"
-    read -r -p "Enter choice [1-3, q]: " USER_INPUT
+while true; do
+    read -r -p "Select option [1-3, q]: " USER_INPUT
     case "${USER_INPUT}" in
-        1) CHOICE="1" ;;
-        2) CHOICE="2" ;;
-        3) CHOICE="3" ;;
-        q|Q) echo "Aborted."; exit 0 ;;
-        *) echo "Invalid choice. Defaulting to 1."; CHOICE="1" ;;
+        1|2|3)
+            CHOICE="${USER_INPUT}"
+            break
+            ;;
+        q|Q)
+            echo "Exiting."
+            exit 0
+            ;;
+        *)
+            echo "Invalid selection: '${USER_INPUT}'. Please choose 1, 2, 3 or q."
+            ;;
     esac
-fi
+done
 
 TMP_RUN_DIR="/tmp/psdoom_run_$(id -u)"
 rm -rf "${TMP_RUN_DIR}"
 mkdir -p "${TMP_RUN_DIR}"
 
-EXTRA_ARGS=()
-
 case "${CHOICE}" in
     1)
-        echo "Configuring Freedoom Phase 1 with psdoom1.wad..."
+        echo "Launching Freedoom Phase 1 with psdoom1.wad..."
         ln -sf "${WADS_DIR}/freedoom1.wad" "${TMP_RUN_DIR}/doom.wad"
         cp -f "${WADS_DIR}/xdoom.wad" "${TMP_RUN_DIR}/xdoom.wad"
         cp -f "${WADS_DIR}/psdoom1.wad" "${TMP_RUN_DIR}/psdoom1.wad"
         ;;
     2)
-        echo "Configuring Freedoom Phase 2 with psdoom2.wad..."
+        echo "Launching Freedoom Phase 2 with psdoom2.wad..."
         ln -sf "${WADS_DIR}/freedoom2.wad" "${TMP_RUN_DIR}/doom2.wad"
         cp -f "${WADS_DIR}/xdoom.wad" "${TMP_RUN_DIR}/xdoom.wad"
         cp -f "${WADS_DIR}/psdoom2.wad" "${TMP_RUN_DIR}/psdoom2.wad"
@@ -94,6 +81,5 @@ case "${CHOICE}" in
         ;;
 esac
 
-echo "Starting psDooM..."
 export DOOMWADDIR="${TMP_RUN_DIR}"
 exec "${BIN}" "$@"
