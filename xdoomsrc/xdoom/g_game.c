@@ -406,7 +406,12 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	}
     }
 
-    // mouse movement is disabled per user preference
+    forward += mousey;
+    if (strafe)
+	side += mousex * 2;
+    else
+	cmd->angleturn -= mousex * 0x8;
+
     mousex = mousey = 0;
 
     if (forward > MAXPLMOVE)

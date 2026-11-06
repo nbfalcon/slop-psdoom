@@ -90,7 +90,8 @@ void I_InitGraphics(void)
         window_height = SCREENHEIGHT;
     }
 
-    window = SDL_CreateWindow("psDooM", window_width, window_height, SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("psDooM", window_width, window_height,
+                              SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS);
     if (!window) {
         I_Error("SDL_CreateWindow failed: %s", SDL_GetError());
     }
@@ -232,9 +233,20 @@ void I_StartTic(void)
                 break;
             }
 
-            case SDL_EVENT_MOUSE_MOTION:
-                // Mouse movement disabled
+            case SDL_EVENT_MOUSE_MOTION: {
+                int buttons = 0;
+                SDL_MouseButtonFlags btn_state = SDL_GetMouseState(NULL, NULL);
+                if (btn_state & SDL_BUTTON_LMASK) buttons |= 1;
+                if (btn_state & SDL_BUTTON_RMASK) buttons |= 2;
+                if (btn_state & SDL_BUTTON_MMASK) buttons |= 4;
+
+                event.type = ev_mouse;
+                event.data1 = buttons;
+                event.data2 = (int)(sdlevent.motion.xrel * 4.0f);
+                event.data3 = -(int)(sdlevent.motion.yrel * 4.0f);
+                D_PostEvent(&event);
                 break;
+            }
 
             default:
                 break;

@@ -29,7 +29,7 @@ The original XDoom engine relied on raw X11/XShm and OSS/Linux sound drivers (`/
 
 - **Video Subsystem (`i_video_sdl3.c`)**:
   - Initialized with `SDL_InitSubSystem(SDL_INIT_VIDEO)`.
-  - Creates a resizable window with letterboxing (`SDL_SetRenderLogicalPresentation(..., SCREENWIDTH, SCREENHEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX)`).
+  - Creates a borderless window (`SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE`) without titlebar or window borders, with letterboxing (`SDL_SetRenderLogicalPresentation(..., SCREENWIDTH, SCREENHEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX)`).
   - Palette conversion transforms Doom's 8-bit paletted framebuffers (`screens[0]`) to 32-bit ARGB8888 streaming textures via `SDL_UpdateTexture()` and `SDL_RenderPresent()`.
   - Supports scaling parameters (`-1`, `-3`, `-4`, default 2x windowed).
 - **Audio Subsystem (`i_sound_sdl3.c`)**:
@@ -38,16 +38,16 @@ The original XDoom engine relied on raw X11/XShm and OSS/Linux sound drivers (`/
 
 ---
 
-## 3. Controls: WASD Support & Mouse Decoupling
+## 3. Controls: WASD Support & Mouse Turning
 
 - **WASD + Arrow Key Movement (`g_game.c:G_BuildTiccmd`)**:
   - Player forward and backward movement accepts `W` and `S` in addition to Up and Down arrow keys.
   - Player strafing left and right accepts `A` and `D` in addition to `,` and `.` (or configured strafe keys).
   - Both key schemes work seamlessly in parallel without conflicting with weapon hotkeys or automap controls.
-- **Disabled Mouse Movement**:
-  - In `i_video_sdl3.c`, suppressed mouse motion events from emitting player look/move delta events.
-  - In `g_game.c`, stripped mouse turn/forward accumulators so that mouse motion cannot move or rotate the player.
-  - In `m_misc.c`, set default `use_mouse = 0` and `mouseb_forward = -1` to avoid unintended mouse button forward motion. Mouse buttons remain bindable for weapon fire if configured.
+- **Mouse Turning & Look**:
+  - In `i_video_sdl3.c`, relative mouse motion updates horizontal/vertical look deltas via `SDL_EVENT_MOUSE_MOTION`.
+  - In `g_game.c`, horizontal mouse motion turns the player angle (`cmd->angleturn -= mousex * 0x8`), allowing smooth mouse mouselook turning.
+  - Mouse buttons remain bindable for weapon fire, use, or strafe.
 
 ---
 
