@@ -214,10 +214,15 @@ void pr_check(void) {
 
   qsort(procs, count, sizeof(proc_entry_t), compare_proc_entries);
 
+  int spawned_count = 0;
   for (int i = 0; i < count; i++) {
     if ( (psallusers || in_ps_userlist(psuser_list_head, procs[i].user)) &&
          !(in_ps_userlist(psnotuser_list_head, procs[i].user)) ) {
+      if (psmaxprocs > 0 && spawned_count >= psmaxprocs) {
+        break;
+      }
       add_to_pid_list(procs[i].pid, procs[i].comm, procs[i].is_daemon);
+      spawned_count++;
     }
   }
 

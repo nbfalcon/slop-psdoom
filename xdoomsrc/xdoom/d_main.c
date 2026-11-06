@@ -79,6 +79,7 @@ boolean nopsmon;  // checkparm for -nopsmon
 boolean nopsact;  // checkparm for -nopsact
 boolean psallusers;  // checkparm for -psallusers
 boolean nopssafety;  // checkparm for -nopssafety
+int psmaxprocs = 32; // maximum number of process monsters to spawn
 
 // To automagically add psdoom1.wad and psdoom2.wad upon load.
 static char *psdoom1wad;
@@ -936,6 +937,15 @@ void D_DoomMain(void)
 // Get flag to determine whether pid monsters can be hurt and killed by
 // things other than a player.  They can be hurt if this flag is true.
     nopssafety = M_CheckParm("-nopssafety");
+
+// Limit the number of process monsters spawned (default 32, 0 = unlimited)
+    p = M_CheckParm("-psmax");
+    if (p && p < myargc - 1)
+    {
+        psmaxprocs = atoi(myargv[p + 1]);
+        if (psmaxprocs < 0)
+            psmaxprocs = 0;
+    }
 
 // Get flag to tell if we show all users' processes.  userlist_arg_given
 // is assigned so we don't set defaults later on since we specified

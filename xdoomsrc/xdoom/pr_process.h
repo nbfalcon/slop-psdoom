@@ -25,6 +25,9 @@ extern boolean nopsact;
 // Flag to allow pid monsters to be damaged by things other than a player.
 extern boolean nopssafety;
 
+// Maximum number of process monsters to spawn (0 = unlimited).
+extern int psmaxprocs;
+
 // Flag to show all users' processes.
 extern boolean psallusers;
 
