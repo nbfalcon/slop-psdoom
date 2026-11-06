@@ -6,8 +6,15 @@
 // Copyright (C) 2000 by David Koppenhofer
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <ctype.h>
+#include <pwd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "doomstat.h"
 #include "info.h"
@@ -77,25 +84,27 @@ static mobj_t *pid_list_tail = NULL;
 static mobj_t *pid_list_pos = NULL;
 
 
+// Structure to hold enumerated process info from /proc
+typedef struct proc_entry_s {
+    int pid;
+    unsigned long long starttime;
+    char comm[64];
+    char user[64];
+    int is_daemon;
+} proc_entry_t;
+
+static int compare_proc_entries(const void *a, const void *b) {
+    const proc_entry_t *pa = (const proc_entry_t *)a;
+    const proc_entry_t *pb = (const proc_entry_t *)b;
+    if (pa->starttime < pb->starttime) return -1;
+    if (pa->starttime > pb->starttime) return 1;
+    return pa->pid - pb->pid;
+}
+
 // pr_check
-// This routine replaces both pr_init() and pr_poll().  I used some code
-// from those routines to make this one, though.
-// Called at the start of a game/level and periodically throughout the
-// playing of the level.  It runs 'ps', capturing certain info about each
-// process except for 'ps' itself.
+// Linux direct /proc scanner: enumerates running processes, sorts them by
+// start time, and feeds them into add_to_pid_list.
 void pr_check(void) {
-
-// Don't open 'ps' right away; see if we're on the right level first,
-// amongst other criteria.
-  FILE *f = NULL;
-
-  char buf[256];
-  char username[256];
-  int pid = 0;
-  char namebuf[256];
-  char tty[256];
-  int demon = false;
-
 // Bypass the 'ps' part of the program entirely if it's an add-on pack
 // to Doom 2 OR we're not on the correct level (e1m1 or map01).
 // Also bypass if we're recording or viewing a demo.
@@ -112,102 +121,108 @@ void pr_check(void) {
      return;
   }
 
-// Now that we know we should run 'ps', do it!
-
-// Split the running of 'ps' into operating system-specific sections to
-// account for the different output formats of the command:
-
-// ******************** LINUX ********************
-#if defined(LINUX)
-
-  /* Standard modern Linux ps command:
-     Outputs username, pid, tty, and command name without headers,
-     sorted by start time.
-  */
-  f = popen("ps -eo user,pid,tty,comm --sort=start_time --no-headers", "r");
-
-  if (!f) {
-    fprintf(stderr, "ERROR: pr_check could not open ps\n");
+  DIR *dir = opendir("/proc");
+  if (!dir) {
+    fprintf(stderr, "ERROR: pr_check could not open /proc\n");
     return;
   }
 
-  /* Read in all process information.  Exclude the last process in the
-     list (the 'ps' we just ran). */
-
-  while (fgets(buf, 255, f)) {
-    if ( pid != 0 ) {
-       // Check for username validity before adding to pid list.
-       if ( (psallusers || in_ps_userlist(psuser_list_head, username)) &&
-            !(in_ps_userlist(psnotuser_list_head, username)) ) {
-          add_to_pid_list(pid, namebuf, demon);
-       }
-    }
-    if (sscanf(buf, "%255s %d %255s %255s", username, &pid, tty, namebuf) == 4) {
-      if (tty[0]=='?')  /* if there is no tty, then it is a daemon */
-        demon = true;
-      else
-        demon = false;
-    } else {
-      pid = 0;
-    }
-  }
-
-// ******************** SOLARIS ********************
-#elif defined(SOLARIS)
-
-  /* Solaris 2.6 (on my development machine, at least) had two versions of
-     'ps' installed.  One was in /usr/bin and the other in /usr/ucb.  The
-     version in /usr/bin seemed to have the better options of the two. */
-  /* 'ps' showing all processes (-A),
-          showing the username (-o user=),
-          showing the pid (-o pid=),
-          showing the tty (-o tty=),
-          showing the command (-o comm=).
-          headers are suppressed by appending an equal sign to the
-            display field name then starting another argument instead of
-            telling what header text to print.
-          unfortunately, there is no way to sort the processes, so we'll
-            just have to deal with spawning the process monster
-            representing 'ps' itself.
-     Sample output:
-root    302   1  pico
-root    334   2  ps
-root    321   2  -bash
-  */
-
-  f = popen("/usr/bin/ps -A -o user= -o pid= -o tty= -o comm=", "r");
-
-  if (!f) {
-    fprintf(stderr, "ERROR: pr_check could not open ps\n");
+  int capacity = 256;
+  int count = 0;
+  proc_entry_t *procs = malloc(capacity * sizeof(proc_entry_t));
+  if (!procs) {
+    closedir(dir);
     return;
   }
 
-  /* Read in all process information.  Since we can't sort by process
-     start time, we can't tell which process is the 'ps' we just ran, so
-     that process will be spawned as a monster, too. */
+  struct dirent *ent;
+  while ((ent = readdir(dir)) != NULL) {
+    if (!isdigit(ent->d_name[0]))
+      continue;
 
-  while (fgets(buf, 255, f)) {
-    sscanf(buf, "%s %d %s %s",
-                 username, &pid, tty, namebuf);
-    if (tty[0]=='?')  /* if there is no tty, then it is a daemon */
-      demon = true;
-    else
-      demon = false;
-    // Check for username validity before adding to pid list.
-    if ( (psallusers || in_ps_userlist(psuser_list_head, username)) &&
-         !(in_ps_userlist(psnotuser_list_head, username)) ) {
-       add_to_pid_list(pid, namebuf, demon);
+    int pid = atoi(ent->d_name);
+    if (pid <= 0)
+      continue;
+
+    char stat_path[256];
+    snprintf(stat_path, sizeof(stat_path), "/proc/%d/stat", pid);
+    FILE *f = fopen(stat_path, "r");
+    if (!f)
+      continue;
+
+    char buf[1024];
+    if (!fgets(buf, sizeof(buf), f)) {
+      fclose(f);
+      continue;
+    }
+    fclose(f);
+
+    char *first_paren = strchr(buf, '(');
+    char *last_paren = strrchr(buf, ')');
+    if (!first_paren || !last_paren || last_paren < first_paren)
+      continue;
+
+    if (count >= capacity) {
+      capacity *= 2;
+      proc_entry_t *new_procs = realloc(procs, capacity * sizeof(proc_entry_t));
+      if (!new_procs)
+        break;
+      procs = new_procs;
+    }
+
+    proc_entry_t *p = &procs[count];
+    p->pid = pid;
+
+    int comm_len = last_paren - (first_paren + 1);
+    if (comm_len >= (int)sizeof(p->comm))
+      comm_len = sizeof(p->comm) - 1;
+    strncpy(p->comm, first_paren + 1, comm_len);
+    p->comm[comm_len] = '\0';
+
+    int tty_nr = 0;
+    unsigned long long starttime = 0;
+    char state;
+    int ppid, pgrp, session, tpgid;
+    unsigned int flags;
+    unsigned long minflt, cminflt, majflt, cmajflt, utime, stime;
+    long cutime, cstime, priority, nice, num_threads, itrealvalue;
+
+    int matched = sscanf(last_paren + 2,
+           "%c %d %d %d %d %d %u %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %llu",
+           &state, &ppid, &pgrp, &session, &tty_nr, &tpgid, &flags,
+           &minflt, &cminflt, &majflt, &cmajflt, &utime, &stime,
+           &cutime, &cstime, &priority, &nice, &num_threads, &itrealvalue,
+           &starttime);
+
+    p->starttime = (matched >= 20) ? starttime : 0;
+    p->is_daemon = (tty_nr == 0);
+
+    struct stat st;
+    p->user[0] = '\0';
+    if (stat(stat_path, &st) == 0) {
+      struct passwd *pw = getpwuid(st.st_uid);
+      if (pw) {
+        strncpy(p->user, pw->pw_name, sizeof(p->user) - 1);
+        p->user[sizeof(p->user) - 1] = '\0';
+      } else {
+        snprintf(p->user, sizeof(p->user), "%u", (unsigned int)st.st_uid);
+      }
+    }
+
+    count++;
+  }
+  closedir(dir);
+
+  qsort(procs, count, sizeof(proc_entry_t), compare_proc_entries);
+
+  for (int i = 0; i < count; i++) {
+    if ( (psallusers || in_ps_userlist(psuser_list_head, procs[i].user)) &&
+         !(in_ps_userlist(psnotuser_list_head, procs[i].user)) ) {
+      add_to_pid_list(procs[i].pid, procs[i].comm, procs[i].is_daemon);
     }
   }
 
-// ******************** UNSUPPORTED OS ********************
-#else
-  fprintf(stderr, "ERROR: a version of 'ps' with the proper output formatting\n       is not available for this OS.\n");
-  return;
-#endif
-
-  pclose(f);
-
+  free(procs);
 }
 
 // add_to_pid_list
