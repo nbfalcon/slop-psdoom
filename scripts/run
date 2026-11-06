@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+#
+# Interactive launcher for psDooM
+# Lets the user choose which WAD / game configuration to run.
+#
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+BUILD_DIR="${ROOT_DIR}/build"
+BIN="${BUILD_DIR}/psdoom"
+WADS_DIR="${ROOT_DIR}/wads"
+
+# Ensure binary is built
+if [[ ! -x "${BIN}" ]]; then
+    echo "psDooM binary not found at ${BIN}."
+    echo "Building with CMake..."
+    cmake -B "${BUILD_DIR}" -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo "${ROOT_DIR}"
+    cmake --build "${BUILD_DIR}"
+fi
+
+# Options:
+# 1) Freedoom: Phase 1 (Doom 1 / Ultimate Doom) + psdoom1.wad
+# 2) Freedoom: Phase 2 (Doom 2 / Hell on Earth) + psdoom2.wad
+# 3) Custom IWAD + PWAD selection
+OPTIONS=(
+    "1" "Freedoom Phase 1 (Ultimate Doom) + psDooM 1"
+    "2" "Freedoom Phase 2 (Doom 2) + psDooM 2"
+    "3" "Vanilla / Custom IWAD from system or path"
+)
+
+CHOICE=""
+if command -v whiptail >/dev/null 2>&1 && [ -t 0 ]; then
+    CHOICE=$(whiptail --title "psDooM Launcher" \
+                      --menu "Select a WAD configuration to play:" 15 65 3 \
+                      "${OPTIONS[@]}" \
+                      3>&1 1>&2 2>&3 || true)
+fi
+
+# Fallback to interactive CLI menu if whiptail is unavailable or cancelled
+if [[ -z "${CHOICE}" ]]; then
+    echo "========================================"
+    echo "            psDooM Launcher             "
+    echo "========================================"
+    echo "Select a WAD configuration to play:"
+    echo "  1) Freedoom Phase 1 (Ultimate Doom) + psDooM 1"
+    echo "  2) Freedoom Phase 2 (Doom 2) + psDooM 2"
+    echo "  3) Custom IWAD from path"
+    echo "  q) Quit"
+    echo "----------------------------------------"
+    read -r -p "Enter choice [1-3, q]: " USER_INPUT
+    case "${USER_INPUT}" in
+        1) CHOICE="1" ;;
+        2) CHOICE="2" ;;
+        3) CHOICE="3" ;;
+        q|Q) echo "Aborted."; exit 0 ;;
+        *) echo "Invalid choice. Defaulting to 1."; CHOICE="1" ;;
+    esac
+fi
+
+TMP_RUN_DIR="/tmp/psdoom_run_$(id -u)"
+rm -rf "${TMP_RUN_DIR}"
+mkdir -p "${TMP_RUN_DIR}"
+
+EXTRA_ARGS=()
+
+case "${CHOICE}" in
+    1)
+        echo "Configuring Freedoom Phase 1 with psdoom1.wad..."
+        ln -sf "${WADS_DIR}/freedoom1.wad" "${TMP_RUN_DIR}/doom.wad"
+        cp -f "${WADS_DIR}/xdoom.wad" "${TMP_RUN_DIR}/xdoom.wad"
+        cp -f "${WADS_DIR}/psdoom1.wad" "${TMP_RUN_DIR}/psdoom1.wad"
+        ;;
+    2)
+        echo "Configuring Freedoom Phase 2 with psdoom2.wad..."
+        ln -sf "${WADS_DIR}/freedoom2.wad" "${TMP_RUN_DIR}/doom2.wad"
+        cp -f "${WADS_DIR}/xdoom.wad" "${TMP_RUN_DIR}/xdoom.wad"
+        cp -f "${WADS_DIR}/psdoom2.wad" "${TMP_RUN_DIR}/psdoom2.wad"
+        ;;
+    3)
+        read -r -p "Enter full path to IWAD (e.g. /path/to/doom2.wad): " CUSTOM_IWAD
+        if [[ ! -f "${CUSTOM_IWAD}" ]]; then
+            echo "File not found: ${CUSTOM_IWAD}"
+            exit 1
+        fi
+        BASENAME="$(basename "${CUSTOM_IWAD}")"
+        ln -sf "${CUSTOM_IWAD}" "${TMP_RUN_DIR}/${BASENAME}"
+        cp -f "${WADS_DIR}/xdoom.wad" "${TMP_RUN_DIR}/xdoom.wad"
+        if [[ "${BASENAME,,}" =~ doom2 ]]; then
+            cp -f "${WADS_DIR}/psdoom2.wad" "${TMP_RUN_DIR}/psdoom2.wad"
+        else
+            cp -f "${WADS_DIR}/psdoom1.wad" "${TMP_RUN_DIR}/psdoom1.wad"
+        fi
+        ;;
+esac
+
+echo "Starting psDooM..."
+export DOOMWADDIR="${TMP_RUN_DIR}"
+exec "${BIN}" "$@"
