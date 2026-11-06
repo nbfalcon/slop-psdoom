@@ -105,8 +105,12 @@ void I_InitGraphics(void)
         I_Error("SDL_CreateRenderer failed: %s", SDL_GetError());
     }
 
-    SDL_SetRenderLogicalPresentation(renderer, SCREENWIDTH, SCREENHEIGHT,
-                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_RendererLogicalPresentation presentation = SDL_LOGICAL_PRESENTATION_LETTERBOX;
+    if (M_CheckParm("-stretch")) {
+        presentation = SDL_LOGICAL_PRESENTATION_STRETCH;
+    }
+
+    SDL_SetRenderLogicalPresentation(renderer, SCREENWIDTH, SCREENHEIGHT, presentation);
 
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
                                 SDL_TEXTUREACCESS_STREAMING,

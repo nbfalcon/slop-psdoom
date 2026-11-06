@@ -190,6 +190,7 @@ boolean		*mousebuttons = &mousearray[1];		// allow [-1]
 // mouse values are used once
 int             mousex;
 int		mousey;
+boolean		mousemvt = false;
 
 int             dclicktime;
 int		dclickstate;
@@ -406,8 +407,19 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 	}
     }
 
-    // Mouse turns / looks around only; never moves forward/backward or strafes
-    cmd->angleturn -= mousex * 0x8;
+    if (mousemvt)
+    {
+	forward += mousey;
+	if (strafe)
+	    side += mousex * 2;
+	else
+	    cmd->angleturn -= mousex * 0x8;
+    }
+    else
+    {
+	// Mouse turns / looks around only; never moves forward/backward or strafes
+	cmd->angleturn -= mousex * 0x8;
+    }
 
     mousex = mousey = 0;
 

@@ -35,6 +35,7 @@ This document provides a comprehensive reference of all command-line flags suppo
 | `-3` | *(none)* | Render at 3x resolution (960x600). | Disabled |
 | `-4` | *(none)* | Render at 4x resolution (1280x800). | Disabled |
 | `-window` / `-windowed` | *(none)* | Run in dynamically resizable windowed mode instead of fullscreen. Toggle at runtime with `Alt+Enter`. | Fullscreen by default |
+| `-stretch` | *(none)* | Stretch rendering to fill the entire window/display instead of maintaining aspect ratio with letterboxing. | Letterboxed by default |
 | *(default)* | *(none)* | Borderless fullscreen mode with integer aspect ratio preservation (letterboxing). Dynamically resizable; toggle fullscreen/windowed with `Alt+Enter`. | Fullscreen |
 | `-nograb` | *(none)* | Disables mouse grabbing / relative mouse capture mode. | Grabbed |
 | `-notrans` | *(none)* | Disables translucency rendering effects. | Translucency enabled |
@@ -61,6 +62,7 @@ This document provides a comprehensive reference of all command-line flags suppo
 | `-warp` | `[e m]` or `[map]` | Warps directly to episode/map (Doom 1: `-warp 1 1`, Doom 2: `-warp 01`). |
 | `-skill` | `<1-5>` | Sets game difficulty (1: I'm too young to die, 5: Nightmare). |
 | `-nomonsters` | *(none)* | Disables spawning of standard game monsters. |
+| `-mousemvt` | *(none)* | Enables legacy mouse movement (moving the mouse forward/backward moves the player forward/backward and strafes if strafe key held). By default, mouse is lookaround only. |
 | `-fast` | *(none)* | Enables fast monsters (like Nightmare difficulty). |
 | `-respawn` | *(none)* | Enables monster respawning. |
 | `-loadgame` | `<slot>` | Loads savegame directly from slot `0-5`. |

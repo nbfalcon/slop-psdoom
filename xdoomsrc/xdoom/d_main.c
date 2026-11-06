@@ -1080,6 +1080,7 @@ void D_DoomMain(void)
     else if (M_CheckParm("-altcoop"))
 	altcoop = 1;
     stripextbits = M_CheckParm("-stripextbits");
+    mousemvt = M_CheckParm("-mousemvt");
 
     // remember state of smoke trails in the state tables
     smoketrail = states[S_ROCKET].action;

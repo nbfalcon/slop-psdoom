@@ -73,4 +73,6 @@ boolean G_Responder(event_t *ev);
 
 void G_ScreenShot(void);
 
+extern boolean mousemvt;
+
 #endif
