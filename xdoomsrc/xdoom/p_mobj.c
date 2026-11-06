@@ -28,7 +28,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 // *** PID BEGIN ***
 #include <string.h>

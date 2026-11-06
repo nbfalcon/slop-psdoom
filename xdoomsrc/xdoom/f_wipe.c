@@ -26,7 +26,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include "z_zone.h"
 #include "i_video.h"

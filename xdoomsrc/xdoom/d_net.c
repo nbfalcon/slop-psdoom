@@ -27,7 +27,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include <stddef.h>
 #include "m_menu.h"

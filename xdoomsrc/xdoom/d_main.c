@@ -30,7 +30,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #define	BGCOLOR		7
 #define	FGCOLOR		8

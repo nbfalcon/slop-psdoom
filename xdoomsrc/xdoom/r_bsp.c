@@ -27,7 +27,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include "doomdef.h"
 #include "m_bbox.h"

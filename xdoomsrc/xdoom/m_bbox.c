@@ -25,7 +25,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #ifdef __GNUG__
 #pragma implementation "m_bbox.h"

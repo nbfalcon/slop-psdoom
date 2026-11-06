@@ -27,7 +27,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include "doomtype.h"
 #include "sounds.h"

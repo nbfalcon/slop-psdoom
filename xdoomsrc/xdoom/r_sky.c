@@ -29,7 +29,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 // Needed for FRACUNIT.
 #include "m_fixed.h"
