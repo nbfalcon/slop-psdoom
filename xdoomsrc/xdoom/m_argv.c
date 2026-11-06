@@ -30,10 +30,6 @@ rcsid[] = "$Id:$";
 
 #include <string.h>
 
-#if defined(SCOOS5) || defined(SCOUW2) || defined(SCOUW7)
-#include "strcmp.h"
-#endif
-
 int		myargc;
 char		**myargv;
 

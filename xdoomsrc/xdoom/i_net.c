@@ -35,16 +35,10 @@ rcsid[] = "$Id:$";
 
 #include <sys/socket.h>
 #include <netinet/in.h>
-#if !defined(SCOUW2) && !defined(SCOUW7)
 #include <arpa/inet.h>
-#endif
 #include <errno.h>
 #include <netdb.h>
 #include <sys/ioctl.h>
-
-#if !defined(LINUX) && !defined(SCOOS5) && !defined(_AIX)
-#include <sys/filio.h>
-#endif
 
 #include "i_system.h"
 #include "d_event.h"

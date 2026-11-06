@@ -48,10 +48,6 @@ rcsid[] = "$Id:$";
 #include "s_sound.h"
 #include "doomstat.h"
 
-#if defined(SCOOS5) || defined(SCOUW2) || defined(SCOUW7)
-#include "strcmp.h"
-#endif
-
 // *** PID BEGIN ***
 // Needed for initialization functions.
 #include "pr_process.h"

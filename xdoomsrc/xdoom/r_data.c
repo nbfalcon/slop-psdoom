@@ -41,13 +41,7 @@ rcsid[] = "$Id:$";
 #include "doomstat.h"
 #include "r_sky.h"
 
-#if defined(LINUX) || defined(SOLARIS)
-#include  <alloca.h>
-#endif
-
-#if defined(SCOOS5) || defined(SCOUW2) || defined(SCOUW7)
-#include "strcmp.h"
-#endif
+#include <alloca.h>
 
 #include "r_data.h"
 

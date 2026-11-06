@@ -21,10 +21,6 @@
 #include "doomdef.h"
 #include "pr_process.h"
 
-#if defined(SCOOS5) || defined(SCOUW2) || defined(SCOUW7)
-#include "strcmp.h"
-#endif
-
 // Have this routine return a pointer to the pid mobj it creates.
 // Return NULL if nothing is created.
 // Also accept a parameter to tell if it is spawning a pid mobj.

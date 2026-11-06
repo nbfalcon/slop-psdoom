@@ -36,16 +36,12 @@ rcsid[] = "$Id:$";
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
-#ifndef __FreeBSD__
 #include <malloc.h>
-#endif
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#if defined(LINUX) || defined(SOLARIS)
 #include <alloca.h>
-#endif
 #define O_BINARY		0
 #endif
 
@@ -58,10 +54,6 @@ rcsid[] = "$Id:$";
 #pragma implementation "w_wad.h"
 #endif
 #include "w_wad.h"
-
-#if defined(SCOOS5) || defined(SCOUW2) || defined(SCOUW7)
-#include "strcmp.h"
-#endif
 
 //
 // GLOBALS
@@ -150,8 +142,8 @@ void ExtractFileBase(char *path, char *dest)
 //   Doom II-specific files and maybe also a common directory,
 // - possibly adding /opt/share/doom,
 // - letting the user specify a list of directories to look up,
-//   in the config file, through some environment variable à la
-//   PATH and through a command-line option à la -I/-L.
+//   in the config file, through some environment variable Ã  la
+//   PATH and through a command-line option Ã  la -I/-L.
 //
 // Also, got to convince TeamTNT to do the same in Boom :).
 //
