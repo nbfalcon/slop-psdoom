@@ -34,6 +34,7 @@ set(PSDOOM_SOURCES
     xdoomsrc/xdoom/hu_lib.c
     xdoomsrc/xdoom/hu_stuff.c
     xdoomsrc/xdoom/i_main.c
+    xdoomsrc/xdoom/i_landlock.c
     xdoomsrc/xdoom/i_net.c
     xdoomsrc/xdoom/i_system.c
     xdoomsrc/xdoom/i_video_sdl3.c

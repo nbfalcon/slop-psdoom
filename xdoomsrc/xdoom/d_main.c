@@ -69,6 +69,7 @@
 #include "r_local.h"
 #include "d_main.h"
 #include "info.h"
+#include "i_landlock.h"
 // *** PID BEGIN ***
 // Need the flags and routines
 #include "pr_process.h"
@@ -382,6 +383,8 @@ void D_DoomLoop(void)
 
     I_InitGraphics();
 
+    I_InitLandlock();
+
     while (1)
     {
 	S_UpdateSounds(players[consoleplayer].mo); // move positional sounds
@@ -640,6 +643,9 @@ void IdentifyVersion(void)
 
 // *** PID BEGIN ***
 // Make a ~/.psdoom directory for savegames, configs, etc.
+    char psdoom_dir[1024];
+    sprintf(psdoom_dir, "%s/.psdoom", home);
+    mkdir(psdoom_dir, 0755);
     sprintf(basedefault, "%s/.psdoom/.doomrc", home);
 // old code:
 //    sprintf(basedefault, "%s/.xdoom/.doomrc", home);

@@ -232,20 +232,9 @@ void I_StartTic(void)
                 break;
             }
 
-            case SDL_EVENT_MOUSE_MOTION: {
-                int buttons = 0;
-                SDL_MouseButtonFlags btn_state = SDL_GetMouseState(NULL, NULL);
-                if (btn_state & SDL_BUTTON_LMASK) buttons |= 1;
-                if (btn_state & SDL_BUTTON_RMASK) buttons |= 2;
-                if (btn_state & SDL_BUTTON_MMASK) buttons |= 4;
-
-                event.type = ev_mouse;
-                event.data1 = buttons;
-                event.data2 = (int)(sdlevent.motion.xrel * 4.0f);
-                event.data3 = -(int)(sdlevent.motion.yrel * 4.0f);
-                D_PostEvent(&event);
+            case SDL_EVENT_MOUSE_MOTION:
+                // Mouse movement disabled
                 break;
-            }
 
             default:
                 break;

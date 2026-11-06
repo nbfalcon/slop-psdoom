@@ -15,6 +15,9 @@
 #include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/resource.h>
+#include <signal.h>
+#include <errno.h>
 
 #include "doomstat.h"
 #include "info.h"
@@ -799,23 +802,32 @@ boolean in_ps_userlist(ps_userlist_t *list_head, char *username) {
 // pr_kill
 // kills the process
 void pr_kill(int pid) {
-  char buf[256];
 // If -nopsact was on the command line, don't actually kill the process
   if ( nopsact ){
      return;
   }
-  sprintf(buf, "kill -9 %d", pid);
-  system(buf);
+  if (kill((pid_t)pid, SIGKILL) < 0) {
+     fprintf(stderr, "psdoom: kill(%d, SIGKILL) failed: %s\n", pid, strerror(errno));
+  }
 }
 
 // pr_renice
 // renices the process
 void pr_renice(int pid) {
-  char buf[256];
 // If -nopsact was on the command line, don't actually re-nice the process
   if ( nopsact ){
      return;
   }
-  sprintf(buf, "renice +5 %d", pid);
-  system(buf);
+  errno = 0;
+  int prio = getpriority(PRIO_PROCESS, (id_t)pid);
+  if (prio == -1 && errno != 0) {
+     fprintf(stderr, "psdoom: getpriority(%d) failed: %s\n", pid, strerror(errno));
+     return;
+  }
+  int new_prio = prio + 5;
+  if (new_prio > 19)
+     new_prio = 19;
+  if (setpriority(PRIO_PROCESS, (id_t)pid, new_prio) < 0) {
+     fprintf(stderr, "psdoom: setpriority(%d, %d) failed: %s\n", pid, new_prio, strerror(errno));
+  }
 }

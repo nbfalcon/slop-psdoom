@@ -264,7 +264,7 @@ default_t	defaults[] =
     {"mousetype", &mousetype, (intptr_t)def_mtype},
     {"mouseb_fire", &mousebfire, 0},
     {"mouseb_strafe", &mousebstrafe, 1},
-    {"mouseb_forward", &mousebforward, 2},
+    {"mouseb_forward", &mousebforward, -1},
 
     {"use_joystick", &usejoystick, 0},
     {"joyb_fire", &joybfire, 0},
