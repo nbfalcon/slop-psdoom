@@ -29,6 +29,7 @@
 
 static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
+#include <stdlib.h>
 #include "doomdef.h"
 #include "s_sound.h"
 #include "p_local.h"

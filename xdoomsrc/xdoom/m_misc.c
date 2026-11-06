@@ -36,6 +36,7 @@ static const char __attribute__((unused)) rcsid[] = "$Id:$";
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <stdint.h>
 
 #include "doomdef.h"
 #include "z_zone.h"
@@ -201,8 +202,8 @@ extern char	*chat_macros[];
 typedef struct
 {
     char	*name;
-    int		*location;
-    long	defaultvalue;
+    void	*location;
+    intptr_t	defaultvalue;
 } default_t;
 
 #ifdef SNDSERV
@@ -248,11 +249,11 @@ default_t	defaults[] =
     {"mb_used", &mb_used, 8},
 
 #ifdef SNDSERV
-    {"sndserver", (long *)&sndserver_filename, (long)&def_sndserver},
+    {"sndserver", &sndserver_filename, (intptr_t)def_sndserver},
 #endif
 
 #ifdef MUSSERV
-    {"musserver", (long *)&musserver_filename, (long)&def_musserver},
+    {"musserver", &musserver_filename, (intptr_t)def_musserver},
 #endif
 
 #endif
@@ -260,8 +261,8 @@ default_t	defaults[] =
     {"use_mouse", &usemouse, 0},
     {"mouse_sensitivity_x", &mouseSensitivityHor, 5},
     {"mouse_sensitivity_y", &mouseSensitivityVer, 5},
-    {"mousedev", (long *)&mousedev, (long)&def_mdev},
-    {"mousetype", (long *)&mousetype, (long)&def_mtype},
+    {"mousedev", &mousedev, (intptr_t)def_mdev},
+    {"mousetype", &mousetype, (intptr_t)def_mtype},
     {"mouseb_fire", &mousebfire, 0},
     {"mouseb_strafe", &mousebstrafe, 1},
     {"mouseb_forward", &mousebforward, 2},
@@ -279,16 +280,16 @@ default_t	defaults[] =
 
     {"usegamma", &usegamma, 0},
 
-    {"chatmacro0", (long *)&chat_macros[0], (long)&def_chat0},
-    {"chatmacro1", (long *)&chat_macros[1], (long)&def_chat1},
-    {"chatmacro2", (long *)&chat_macros[2], (long)&def_chat2},
-    {"chatmacro3", (long *)&chat_macros[3], (long)&def_chat3},
-    {"chatmacro4", (long *)&chat_macros[4], (long)&def_chat4},
-    {"chatmacro5", (long *)&chat_macros[5], (long)&def_chat5},
-    {"chatmacro6", (long *)&chat_macros[6], (long)&def_chat6},
-    {"chatmacro7", (long *)&chat_macros[7], (long)&def_chat7},
-    {"chatmacro8", (long *)&chat_macros[8], (long)&def_chat8},
-    {"chatmacro9", (long *)&chat_macros[9], (long)&def_chat9}
+    {"chatmacro0", &chat_macros[0], (intptr_t)def_chat0},
+    {"chatmacro1", &chat_macros[1], (intptr_t)def_chat1},
+    {"chatmacro2", &chat_macros[2], (intptr_t)def_chat2},
+    {"chatmacro3", &chat_macros[3], (intptr_t)def_chat3},
+    {"chatmacro4", &chat_macros[4], (intptr_t)def_chat4},
+    {"chatmacro5", &chat_macros[5], (intptr_t)def_chat5},
+    {"chatmacro6", &chat_macros[6], (intptr_t)def_chat6},
+    {"chatmacro7", &chat_macros[7], (intptr_t)def_chat7},
+    {"chatmacro8", &chat_macros[8], (intptr_t)def_chat8},
+    {"chatmacro9", &chat_macros[9], (intptr_t)def_chat9}
 };
 
 int	numdefaults;
@@ -315,11 +316,11 @@ void M_SaveDefaults(void)
 	if (defaults[i].defaultvalue > -0xfff
 	    && defaults[i].defaultvalue < 0xfff)
 	{
-	    v = (int)*defaults[i].location;
+	    v = *(int *)defaults[i].location;
 	    fprintf(f, "%s\t\t%i\n", defaults[i].name, v);
 	} else {
 	    fprintf(f, "%s\t\t\"%s\"\n", defaults[i].name,
-		     *(char **)(defaults[i].location));
+		     *(char **)defaults[i].location);
 	}
     }
 
@@ -345,7 +346,13 @@ void M_LoadDefaults(void)
     // set everything to base values
     numdefaults = sizeof(defaults) / sizeof(defaults[0]);
     for (i = 0; i < numdefaults; i++)
-	*defaults[i].location = (long)defaults[i].defaultvalue;
+    {
+	if (defaults[i].defaultvalue > -0xfff
+	    && defaults[i].defaultvalue < 0xfff)
+	    *(int *)defaults[i].location = (int)defaults[i].defaultvalue;
+	else
+	    *(char **)defaults[i].location = (char *)defaults[i].defaultvalue;
+    }
 
     // check for a custom default file
     i = M_CheckParm("-config");
@@ -383,10 +390,9 @@ void M_LoadDefaults(void)
 		    if (!strcmp(def, defaults[i].name))
 		    {
 			if (!isstring)
-			    *defaults[i].location = parm;
+			    *(int *)defaults[i].location = parm;
 			else
-			    *defaults[i].location =
-				(long)newstring;
+			    *(char **)defaults[i].location = newstring;
 			break;
 		    }
 	    }

@@ -95,10 +95,6 @@ add_executable(psdoom ${PSDOOM_SOURCES})
 
 target_compile_options(psdoom PRIVATE
     -Wall
-    -Wno-implicit-function-declaration
-    -Wno-incompatible-pointer-types
-    -Wno-pointer-to-int-cast
-    -Wno-int-conversion
 )
 
 target_link_libraries(psdoom PRIVATE ${SDL3_LIBRARIES} m)

@@ -29,6 +29,7 @@
 
 static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
+#include <stddef.h>
 #include "m_menu.h"
 #include "i_system.h"
 #include "i_video.h"
@@ -87,7 +88,7 @@ doomdata_t	reboundstore;
 //
 int NetbufferSize(void)
 {
-    return (int)&(((doomdata_t *)0)->cmds[netbuffer->numtics]);
+    return (int)offsetof(doomdata_t, cmds[netbuffer->numtics]);
 }
 
 //
@@ -106,7 +107,7 @@ unsigned NetbufferChecksum(void)
     /*NOTREACHED*/
 #endif
 
-    l = (NetbufferSize() - (int)&(((doomdata_t *)0)->retransmitfrom)) / 4;
+    l = (NetbufferSize() - (int)offsetof(doomdata_t, retransmitfrom)) / 4;
     for (i = 0; i < l; i++)
 	c += ((unsigned *)&netbuffer->retransmitfrom)[i] * (i + 1);
 
