@@ -90,8 +90,12 @@ void I_InitGraphics(void)
         window_height = SCREENHEIGHT;
     }
 
-    window = SDL_CreateWindow("psDooM", window_width, window_height,
-                              SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS);
+    SDL_WindowFlags flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS;
+    if (!M_CheckParm("-window") && !M_CheckParm("-windowed")) {
+        flags |= SDL_WINDOW_FULLSCREEN;
+    }
+
+    window = SDL_CreateWindow("psDooM", window_width, window_height, flags);
     if (!window) {
         I_Error("SDL_CreateWindow failed: %s", SDL_GetError());
     }

@@ -29,7 +29,7 @@ The original XDoom engine relied on raw X11/XShm and OSS/Linux sound drivers (`/
 
 - **Video Subsystem (`i_video_sdl3.c`)**:
   - Initialized with `SDL_InitSubSystem(SDL_INIT_VIDEO)`.
-  - Creates a borderless window (`SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE`) without titlebar or window borders, with letterboxing (`SDL_SetRenderLogicalPresentation(..., SCREENWIDTH, SCREENHEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX)`).
+  - Creates a borderless fullscreen window by default (`SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE`), with letterboxing (`SDL_SetRenderLogicalPresentation(..., SCREENWIDTH, SCREENHEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX)`). Windowed mode can be requested with `-window` / `-windowed`.
   - Palette conversion transforms Doom's 8-bit paletted framebuffers (`screens[0]`) to 32-bit ARGB8888 streaming textures via `SDL_UpdateTexture()` and `SDL_RenderPresent()`.
   - Supports scaling parameters (`-1`, `-3`, `-4`, default 2x windowed).
 - **Audio Subsystem (`i_sound_sdl3.c`)**:
