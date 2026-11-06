@@ -198,6 +198,12 @@ void I_StartTic(void)
                 break;
 
             case SDL_EVENT_KEY_DOWN: {
+                if (sdlevent.key.key == SDLK_RETURN && (sdlevent.key.mod & SDL_KMOD_ALT)) {
+                    SDL_WindowFlags cur_flags = SDL_GetWindowFlags(window);
+                    bool is_full = (cur_flags & SDL_WINDOW_FULLSCREEN) != 0;
+                    SDL_SetWindowFullscreen(window, !is_full);
+                    break;
+                }
                 int key = TranslateKey(sdlevent.key.key);
                 if (key != 0) {
                     event.type = ev_keydown;

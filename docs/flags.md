@@ -34,8 +34,8 @@ This document provides a comprehensive reference of all command-line flags suppo
 | `-1` | *(none)* | Render at 1x resolution (320x200). | Disabled |
 | `-3` | *(none)* | Render at 3x resolution (960x600). | Disabled |
 | `-4` | *(none)* | Render at 4x resolution (1280x800). | Disabled |
-| `-window` / `-windowed` | *(none)* | Run in windowed mode instead of fullscreen. | Fullscreen by default |
-| *(default)* | *(none)* | Borderless fullscreen mode with integer aspect ratio preservation (letterboxing). | Fullscreen |
+| `-window` / `-windowed` | *(none)* | Run in dynamically resizable windowed mode instead of fullscreen. Toggle at runtime with `Alt+Enter`. | Fullscreen by default |
+| *(default)* | *(none)* | Borderless fullscreen mode with integer aspect ratio preservation (letterboxing). Dynamically resizable; toggle fullscreen/windowed with `Alt+Enter`. | Fullscreen |
 | `-nograb` | *(none)* | Disables mouse grabbing / relative mouse capture mode. | Grabbed |
 | `-notrans` | *(none)* | Disables translucency rendering effects. | Translucency enabled |
 | `-noendtxt` | *(none)* | Suppresses rendering the ENDOOM text screen upon game exit. | ENDOOM enabled |
