@@ -95,7 +95,6 @@ set(PSDOOM_SOURCES
 add_executable(psdoom ${PSDOOM_SOURCES})
 
 target_compile_options(psdoom PRIVATE
-    -O2
     -Wall
     -Wno-implicit-function-declaration
     -Wno-incompatible-pointer-types
