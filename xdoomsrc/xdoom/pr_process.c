@@ -120,17 +120,11 @@ void pr_check(void) {
 // ******************** LINUX ********************
 #if defined(LINUX)
 
-  /* 'ps' suppressing the header (h),
-          showing all users' processes (a),
-          showing processes without a controlling terminal (x),
-          in 'user' format (u),
-          sorted by process start time (OT).
-     Sample output:
-root       302  0.1  1.9  1304   756   1 S    19:55   0:00 pico pr_process.c
-root       321  0.2  2.1  1268   844   2 S    20:01   0:00 -bash
-root       334  0.0  1.2   848   476   2 R    20:06   0:00 ps h a x u OT
+  /* Standard modern Linux ps command:
+     Outputs username, pid, tty, and command name without headers,
+     sorted by start time.
   */
-  f = popen("ps h a x u OT", "r");
+  f = popen("ps -eo user,pid,tty,comm --sort=start_time --no-headers", "r");
 
   if (!f) {
     fprintf(stderr, "ERROR: pr_check could not open ps\n");
@@ -148,12 +142,14 @@ root       334  0.0  1.2   848   476   2 R    20:06   0:00 ps h a x u OT
           add_to_pid_list(pid, namebuf, demon);
        }
     }
-    sscanf(buf, "%s %d %*f %*f %*d %*d %s %*4c %*s %*s %s",
-          username, &pid,              tty,            namebuf);
-    if (tty[0]=='?')  /* if there is no tty, then it is a daemon */
-      demon = true;
-    else
-      demon = false;
+    if (sscanf(buf, "%255s %d %255s %255s", username, &pid, tty, namebuf) == 4) {
+      if (tty[0]=='?')  /* if there is no tty, then it is a daemon */
+        demon = true;
+      else
+        demon = false;
+    } else {
+      pid = 0;
+    }
   }
 
 // ******************** SOLARIS ********************
