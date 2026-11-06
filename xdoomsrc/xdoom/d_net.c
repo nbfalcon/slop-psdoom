@@ -27,8 +27,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include "m_menu.h"
 #include "i_system.h"
@@ -451,7 +450,7 @@ void CheckAbort(void)
 	I_StartTic();
 
     I_StartTic();
-    for (; eventtail != eventhead; eventtail = (++eventtail) & (MAXEVENTS - 1))
+    for (; eventtail != eventhead; eventtail = (eventtail + 1) & (MAXEVENTS - 1))
     {
 	ev = &events[eventtail];
 	if (ev->type == ev_keydown && ev->data1 == KEY_ESCAPE)
@@ -632,7 +631,6 @@ void TryRunTics(void)
     int		realtics;
     int		availabletics;
     int		counts;
-    int		numplaying;
 
     // get real tics
     entertic = I_GetTime() / ticdup;
@@ -643,12 +641,10 @@ void TryRunTics(void)
     NetUpdate();
 
     lowtic = MAXINT;
-    numplaying = 0;
     for (i = 0; i < doomcom->numnodes; i++)
     {
 	if (nodeingame[i])
 	{
-	    numplaying++;
 	    if (nettics[i] < lowtic)
 		lowtic = nettics[i];
 	}

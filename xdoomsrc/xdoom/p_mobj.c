@@ -28,8 +28,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 // *** PID BEGIN ***
 #include <string.h>
@@ -934,22 +933,19 @@ mobj_t *P_SpawnMapThing(mapthing_ext_t *mthing, boolean is_pid_mobj)
 
     // don't spawn keycards and players in deathmatch
     if (deathmatch && mobjinfo[i].flags & MF_NOTDMATCH)
-// *** PID BEGIN ***
-// Return NULL here.
+    {
        return NULL;
-// old code:
-//     return;
+    }
 
-
-       // don't spawn any monsters if -nomonsters
-       // Don't affect pid mobj spawning.
-       if (nomonsters && !is_pid_mobj
-          && (i == MT_SKULL
-               || (mobjinfo[i].flags & MF_COUNTKILL)))
-       {
-          // Return NULL here.
-          return NULL;
-       }
+    // don't spawn any monsters if -nomonsters
+    // Don't affect pid mobj spawning.
+    if (nomonsters && !is_pid_mobj
+       && (i == MT_SKULL
+            || (mobjinfo[i].flags & MF_COUNTKILL)))
+    {
+       // Return NULL here.
+       return NULL;
+    }
 
 // old code:
        // don't spawn any monsters if -nomonsters

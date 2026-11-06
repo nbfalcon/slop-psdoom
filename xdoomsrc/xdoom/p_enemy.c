@@ -28,8 +28,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include <stdlib.h>
 
@@ -496,11 +495,8 @@ boolean P_LookForPlayers(mobj_t *actor, boolean allaround)
     int		c;
     int		stop;
     player_t	*player;
-    sector_t	*sector;
     angle_t	an;
     fixed_t	dist;
-
-    sector = actor->subsector->sector;
 
     c = 0;
     stop = (actor->lastlook - 1) & 3;

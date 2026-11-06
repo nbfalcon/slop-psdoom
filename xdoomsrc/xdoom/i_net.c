@@ -25,8 +25,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include <stdlib.h>
 #include <string.h>
@@ -142,7 +141,7 @@ void PacketGet(void)
     int			i;
     int			c;
     struct sockaddr_in	fromaddress;
-    int			fromlen;
+    socklen_t		fromlen;
     doomdata_t		sw;
 
     fromlen = sizeof(fromaddress);

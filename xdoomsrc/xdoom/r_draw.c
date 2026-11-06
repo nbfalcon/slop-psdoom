@@ -29,8 +29,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include "doomdef.h"
 #include "i_system.h"
@@ -365,8 +364,6 @@ void R_DrawFuzzColumn(void)
 {
     int			count;
     byte		*dest;
-    fixed_t		frac;
-    fixed_t		fracstep;
 
     // Adjust borders. Low...
     if (!dc_yl)
@@ -391,36 +388,8 @@ void R_DrawFuzzColumn(void)
     }
 #endif
 
-    // Keep till detailshift bug in blocky mode fixed,
-    //  or blocky mode removed.
-    /* WATCOM code
-    if (detailshift)
-    {
-	if (dc_x & 1)
-	{
-	    outpw(GC_INDEX, GC_READMAP + (2 << 8));
-	    outp(SC_INDEX + 1, 12);
-	}
-	else
-	{
-	    outpw(GC_INDEX, GC_READMAP);
-	    outp(SC_INDEX + 1, 3);
-	}
-	dest = destview + dc_yl * 80 + (dc_x >> 1);
-    }
-    else
-    {
-	outpw(GC_INDEX, GC_READMAP + ((dc_x & 3) << 8));
-	outp(SC_INDEX + 1, 1 << (dc_x & 3));
-	dest = destview + dc_yl * 80 + (dc_x >> 2);
-    }*/
-
     // Does not work with blocky mode.
     dest = ylookup[dc_yl] + columnofs[dc_x];
-
-    // Looks familiar.
-    fracstep = dc_iscale;
-    frac = dc_texturemid + (dc_yl-centery) * fracstep;
 
     // Looks like an attempt at dithering,
     //  using the colormap #6 (of 0-31, a bit
@@ -438,8 +407,6 @@ void R_DrawFuzzColumn(void)
 	    fuzzpos = 0;
 
 	dest += SCREENWIDTH;
-
-	frac += fracstep;
     } while (count--);
 }
 

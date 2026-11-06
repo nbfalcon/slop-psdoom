@@ -26,8 +26,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include "z_zone.h"
 #include "doomdef.h"
@@ -403,7 +402,6 @@ int EV_DoDoor(line_t *line, vldoor_e type)
 void EV_VerticalDoor(line_t *line, mobj_t *thing)
 {
     player_t	*player;
-    int		secnum;
     sector_t	*sec;
     vldoor_t	*door;
     int		side;
@@ -458,7 +456,6 @@ void EV_VerticalDoor(line_t *line, mobj_t *thing)
 
     // if the sector has an active thinker, use it
     sec = sides[line->sidenum[side ^ 1]].sector;
-    secnum = sec-sectors;
 
     if (sec->ceilingdata)
     {
@@ -903,7 +900,7 @@ void EV_ForceField (line_t *line, int flag)
     for (i = -1; (i = P_FindLineFromLineTag(line, i)) >= 0;)
     {
 	// force field must be 2s line
-	if (!lines[i].flags & ML_TWOSIDED)
+	if (!(lines[i].flags & ML_TWOSIDED))
 	    continue;
 
 	// make sure force field isn't open already

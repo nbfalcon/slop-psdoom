@@ -84,7 +84,6 @@ set(PSDOOM_SOURCES
     xdoomsrc/xdoom/sounds.c
     xdoomsrc/xdoom/st_lib.c
     xdoomsrc/xdoom/st_stuff.c
-    xdoomsrc/xdoom/strcmp.c
     xdoomsrc/xdoom/tables.c
     xdoomsrc/xdoom/v_video.c
     xdoomsrc/xdoom/w_wad.c

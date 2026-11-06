@@ -31,8 +31,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include <stdlib.h>
 
@@ -1523,7 +1522,7 @@ boolean P_UseSpecialLine(mobj_t *thing, line_t *line, int side)
 	for (i = -1; (i = P_FindLineFromLineTag(line, i)) >= 0;)
 	{
 	    // teleporter must be 2s line
-	    if ( !lines[i].flags & ML_TWOSIDED )
+	    if ( !(lines[i].flags & ML_TWOSIDED) )
 		continue;
 
 	    // make it a player teleporter
@@ -1812,7 +1811,7 @@ int EV_DoDonut(line_t *line)
 	s2 = getNextSector(s1->lines[0], s1);
 	for (i = 0; i < s2->linecount; i++)
 	{
-	    if ((!s2->lines[i]->flags & ML_TWOSIDED) ||
+	    if ((!(s2->lines[i]->flags & ML_TWOSIDED)) ||
 		(s2->lines[i]->backsector == s1))
 		continue;
 	    s3 = s2->lines[i]->backsector;
@@ -1872,11 +1871,6 @@ void P_SpawnSpecials(void)
 {
     sector_t	*sector;
     int		i;
-    int		episode;
-
-    episode = 1;
-    if (W_CheckNumForName("texture2") >= 0)
-	episode = 2;
 
     // See if -TIMER needs to be used.
     levelTimer = false;

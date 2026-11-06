@@ -27,8 +27,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include "doomdef.h"
 #include "s_sound.h"
@@ -213,6 +212,7 @@ int EV_SilentLineTeleport(line_t *line, int side, mobj_t *thing,
 	return 0;
 
     for (i = -1; (i = P_FindLineFromLineTag(line, i)) >= 0;)
+    {
 	if ((l = lines + i) != line && l->backsector)
 	{
 	    // get the thing's position along the source linedef
@@ -319,6 +319,7 @@ int EV_SilentLineTeleport(line_t *line, int side, mobj_t *thing,
 
 	    return 1;
 	}
+    }
 
-	return 0;
+    return 0;
 }

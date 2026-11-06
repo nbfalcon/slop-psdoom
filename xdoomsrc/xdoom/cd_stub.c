@@ -27,14 +27,13 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include "cd_audio.h"
 
 int CD_init()
 {
-    return 1;	// make sure it will play the default musserver music!
+    return 1;
 }
 
 void CD_shutdown()
@@ -43,30 +42,30 @@ void CD_shutdown()
 
 void CD_song(void *data)
 {
-    data = data;
+    (void)data;
 }
 
 void CD_start(int handle)
 {
-    handle = handle;
+    (void)handle;
 }
 
 void CD_stop(int handle)
 {
-    handle = handle;
+    (void)handle;
 }
 
 void CD_pause(int handle)
 {
-    handle = handle;
+    (void)handle;
 }
 
 void CD_resume(int handle)
 {
-    handle = handle;
+    (void)handle;
 }
 
 void CD_volume(int vol)
 {
-    vol = vol;
+    (void)vol;
 }

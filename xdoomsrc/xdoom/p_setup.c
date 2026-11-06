@@ -29,8 +29,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include <math.h>
 
@@ -689,13 +688,12 @@ void P_LoadLineDefs2Ext(int lump)
 	// handle special types
 	switch (ld->special)
 	{
-	    int		lump, j;
+	    int		j;
 
 	    case 208:		// translucent 2s textures, ZDoom
 				// first argument is tag, second controls
 				// how opaque the texture is, not supported
 				// yet.
-		lump = sides[*ld->sidenum].special; // translucency from sidedef
 		if (!ld->tag)
 		    ld->tranlump = 0;	// affect this linedef only
 		else

@@ -27,8 +27,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include <stdlib.h>
 
@@ -419,7 +418,10 @@ void R_StoreWallRange(int start, int stop)
 
     // calculate rw_distance for scale calculation
     rw_normalangle = curline->angle + ANG90;
-    offsetangle = abs(rw_normalangle - rw_angle1);
+    offsetangle = rw_normalangle - rw_angle1;
+
+    if (offsetangle > ANG180)
+	offsetangle = -offsetangle;
 
     if (offsetangle > ANG90)
 	offsetangle = ANG90;

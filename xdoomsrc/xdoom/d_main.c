@@ -30,8 +30,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #define	BGCOLOR		7
 #define	FGCOLOR		8
@@ -170,7 +169,7 @@ int 		eventtail;
 void D_PostEvent(event_t *ev)
 {
     events[eventhead] = *ev;
-    eventhead = (++eventhead) & (MAXEVENTS - 1);
+    eventhead = (eventhead + 1) & (MAXEVENTS - 1);
 }
 
 //
@@ -186,7 +185,7 @@ void D_ProcessEvents(void)
 	 && (W_CheckNumForName("map01") < 0))
       return;
 
-    for (; eventtail != eventhead; eventtail = (++eventtail) & (MAXEVENTS - 1))
+    for (; eventtail != eventhead; eventtail = (eventtail + 1) & (MAXEVENTS - 1))
     {
 	ev = &events[eventtail];
 	if (M_Responder(ev))
@@ -1421,7 +1420,7 @@ void D_DoomMain(void)
 	// for statistics driver
 	extern void	*statcopy;
 
-	statcopy = (void*)atoi(myargv[p + 1]);
+	statcopy = (void*)(uintptr_t)atoi(myargv[p + 1]);
 	printf("External statistics registered.\n");
     }
 

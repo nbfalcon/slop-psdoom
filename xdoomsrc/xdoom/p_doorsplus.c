@@ -24,8 +24,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include "z_zone.h"
 #include "p_local.h"
@@ -42,7 +41,7 @@ void EV_PlusForceField(int id, line_t *ln, mobj_t *thing, int flag)
 	while ((line = P_FindLineFromTag(id, line)) >= 0)
 	{
 		// force field must be 2s line
-		if (!lines[line].flags & ML_TWOSIDED)
+		if (!(lines[line].flags & ML_TWOSIDED))
 			continue;
 
 		// make sure force field isn't open already

@@ -25,8 +25,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id:$";
+static const char __attribute__((unused)) rcsid[] = "$Id:$";
 
 #include <stdio.h>
 
@@ -575,7 +574,6 @@ void AM_maxOutWindowScale(void)
 boolean AM_Responder(event_t *ev)
 {
     int rc;
-    static int cheatstate = 0;
     static int bigstate = 0;
     static char buffer[20];
 
@@ -666,7 +664,6 @@ boolean AM_Responder(event_t *ev)
 	    break;
 
 	  default:
-	    cheatstate=0;
 	    rc = false;
 	}
 	if (!deathmatch && cht_CheckCheat(&cheat_amap, ev->data1))
