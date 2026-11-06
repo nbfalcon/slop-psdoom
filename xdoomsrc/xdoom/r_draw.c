@@ -130,45 +130,62 @@ void R_DrawColumn (void)
   {
     register const byte *source = dc_source;
     register const lighttable_t *colormap = dc_colormap;
-    register unsigned heightmask = dc_texheight - 1;
-    if (dc_texheight & heightmask)   // not a power of 2
+    if (dc_texheight == 0)
       {
-        heightmask++;
-        heightmask <<= FRACBITS;
-
-        if (frac < 0)
-          while ((frac += heightmask) <  0);
-        else
-          while (frac >= heightmask)
-            frac -= heightmask;
-
-        do
+        while ((count -= 2) >= 0)
           {
-            // Re-map color indices from wall texture column
-            //  using a lighting/special effects LUT.
-
-            // heightmask is the Tutti-Frutti fix
-
             *dest = colormap[source[frac >> FRACBITS]];
             dest += SCREENWIDTH;
-            if ((frac += fracstep) >= heightmask)
-              frac -= heightmask;
-          }
-        while (--count);
-      }
-    else
-      {
-        while ((count -= 2) >= 0)	// texture height is a power of 2
-          {
-            *dest = colormap[source[(frac >> FRACBITS) & heightmask]];
-            dest += SCREENWIDTH;
             frac += fracstep;
-            *dest = colormap[source[(frac >> FRACBITS) & heightmask]];
+            *dest = colormap[source[frac >> FRACBITS]];
             dest += SCREENWIDTH;
             frac += fracstep;
           }
         if (count & 1)
-          *dest = colormap[source[(frac >> FRACBITS) & heightmask]];
+          *dest = colormap[source[frac >> FRACBITS]];
+      }
+    else
+      {
+        register unsigned heightmask = dc_texheight - 1;
+        if (dc_texheight & heightmask)   // not a power of 2
+          {
+            heightmask++;
+            heightmask <<= FRACBITS;
+
+            if (frac < 0)
+              while ((frac += heightmask) <  0);
+            else
+              while (frac >= heightmask)
+                frac -= heightmask;
+
+            do
+              {
+                // Re-map color indices from wall texture column
+                //  using a lighting/special effects LUT.
+
+                // heightmask is the Tutti-Frutti fix
+
+                *dest = colormap[source[frac >> FRACBITS]];
+                dest += SCREENWIDTH;
+                if ((frac += fracstep) >= heightmask)
+                  frac -= heightmask;
+              }
+            while (--count);
+          }
+        else
+          {
+            while ((count -= 2) >= 0)	// texture height is a power of 2
+              {
+                *dest = colormap[source[(frac >> FRACBITS) & heightmask]];
+                dest += SCREENWIDTH;
+                frac += fracstep;
+                *dest = colormap[source[(frac >> FRACBITS) & heightmask]];
+                dest += SCREENWIDTH;
+                frac += fracstep;
+              }
+            if (count & 1)
+              *dest = colormap[source[(frac >> FRACBITS) & heightmask]];
+          }
       }
   }
 }
@@ -560,48 +577,65 @@ void R_DrawTranslucentColumn(void)
   {
     register const byte *source = dc_source;
     register const lighttable_t *colormap = dc_colormap;
-    register unsigned heightmask = dc_texheight - 1;
-    if (dc_texheight & heightmask)   // not a power of 2
+    if (dc_texheight == 0)
       {
-        heightmask++;
-        heightmask <<= FRACBITS;
-
-        if (frac < 0)
-          while ((frac += heightmask) <  0);
-        else
-          while (frac >= heightmask)
-            frac -= heightmask;
-
-        do
+        while ((count -= 2) >= 0)
           {
-            // Re-map color indices from wall texture column
-            //  using a lighting/special effects LUT.
-
-            // heightmask is the Tutti-Frutti fix
-
             *dest = tranmap[(*dest << 8) + colormap[source[frac >> FRACBITS]]];
             dest += SCREENWIDTH;
-            if ((frac += fracstep) >= heightmask)
-              frac -= heightmask;
-          }
-        while (--count);
-      }
-    else
-      {
-        while ((count -= 2) >= 0)	// texture height is a power of 2
-          {
-            *dest = tranmap[(*dest << 8) + colormap[source[(frac >> FRACBITS) &
-				heightmask]]];
-            dest += SCREENWIDTH;
             frac += fracstep;
-            *dest = tranmap[(*dest << 8) + colormap[source[(frac >> FRACBITS) &
-				heightmask]]];
+            *dest = tranmap[(*dest << 8) + colormap[source[frac >> FRACBITS]]];
             dest += SCREENWIDTH;
             frac += fracstep;
           }
         if (count & 1)
-          *dest = tranmap[(*dest << 8) + colormap[source[(frac >> FRACBITS) &
-				heightmask]]];
+          *dest = tranmap[(*dest << 8) + colormap[source[frac >> FRACBITS]]];
+      }
+    else
+      {
+        register unsigned heightmask = dc_texheight - 1;
+        if (dc_texheight & heightmask)   // not a power of 2
+          {
+            heightmask++;
+            heightmask <<= FRACBITS;
+
+            if (frac < 0)
+              while ((frac += heightmask) <  0);
+            else
+              while (frac >= heightmask)
+                frac -= heightmask;
+
+            do
+              {
+                // Re-map color indices from wall texture column
+                //  using a lighting/special effects LUT.
+
+                // heightmask is the Tutti-Frutti fix
+
+                *dest = tranmap[(*dest << 8) + colormap[source[frac >> FRACBITS]]];
+                dest += SCREENWIDTH;
+                if ((frac += fracstep) >= heightmask)
+                  frac -= heightmask;
+              }
+            while (--count);
+          }
+        else
+          {
+            while ((count -= 2) >= 0)	// texture height is a power of 2
+              {
+                *dest = tranmap[(*dest << 8) + colormap[source[(frac >> FRACBITS) &
+				    heightmask]]];
+                dest += SCREENWIDTH;
+                frac += fracstep;
+                *dest = tranmap[(*dest << 8) + colormap[source[(frac >> FRACBITS) &
+				    heightmask]]];
+                dest += SCREENWIDTH;
+                frac += fracstep;
+              }
+            if (count & 1)
+              *dest = tranmap[(*dest << 8) + colormap[source[(frac >> FRACBITS) &
+				    heightmask]]];
+          }
       }
   }
 }
